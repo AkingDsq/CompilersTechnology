@@ -126,9 +126,9 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>40</y>
+        <y>118</y>
         <width>379</width>
-        <height>369</height>
+        <height>291</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="CsInput" rowstretch="0" columnstretch="0,0,0" rowminimumheight="0" columnminimumwidth="0,0,0">
@@ -184,10 +184,10 @@
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>40</y>
+        <x>170</x>
+        <y>0</y>
         <width>41</width>
-        <height>71</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
@@ -210,6 +210,99 @@
       </property>
       <property name="text">
        <string>删除文法</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="VnInput">
+      <property name="geometry">
+       <rect>
+        <x>49</x>
+        <y>40</y>
+        <width>160</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="VtInput">
+      <property name="geometry">
+       <rect>
+        <x>49</x>
+        <y>80</y>
+        <width>160</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>40</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Vn</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>80</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Vt</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>40</y>
+        <width>20</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>S</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="S">
+      <property name="geometry">
+       <rect>
+        <x>269</x>
+        <y>40</y>
+        <width>160</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
