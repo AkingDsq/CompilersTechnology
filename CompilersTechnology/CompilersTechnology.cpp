@@ -157,6 +157,7 @@ void CompilersTechnology::on_chargeCs_clicked() {
     if(wf3 == SumNum / 3) wf = 3;
     else if(wf2 == SumNum / 3) wf = 2;
     else if(wf1 == SumNum / 3) wf = 1;
+    else wf = 0;
     ui.csOutput->append("文法类型为" + QString::number(wf) + "型文法");
 }
     
