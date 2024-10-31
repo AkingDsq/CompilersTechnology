@@ -153,7 +153,6 @@ void CompilersTechnology::on_chargeCs_clicked() {
             wf1++;
         }
     }
-    qDebug() << wf3 << wf2 << wf1;
     if(wf3 == SumNum / 3) wf = 3;
     else if(wf2 == SumNum / 3) wf = 2;
     else if(wf1 == SumNum / 3) wf = 1;
