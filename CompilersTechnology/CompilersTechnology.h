@@ -19,6 +19,8 @@ private:
     QPushButton* page1;
     QPushButton* page2;
     QPushButton* page3;
+    //
+    QScrollArea* wfSa;
     // 文法输入（添加或者删除）
     QGridLayout* CsInputLayout;
     QPushButton* addCS;

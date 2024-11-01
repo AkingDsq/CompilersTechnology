@@ -37,16 +37,20 @@ void CompilersTechnology::on_addCS_clicked() {
     QLineEdit* lineEdit2 = new QLineEdit("");
     lineEdit2->setObjectName("R" + SumNum / 3);    // 设置对象名称
 
+    if ((SumNum/3 + 1) * (ui.L0->height() + 10) > ui.WfSa->height()) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() + ui.L0->height() + 10) ;       // 添加时自适应滑块
     CsInputLayout->addWidget(lineEdit1, SumNum / 3, 0); // 第一行第一列
     CsInputLayout->addWidget(label, SumNum / 3, 1);     // 第一行第二列
     CsInputLayout->addWidget(lineEdit2, SumNum /3, 2); // 第一行第三列
+
 }
 void CompilersTechnology::on_deleteCS_clicked() {
     int SumNum = CsInputLayout->count();
+    if ((SumNum / 3 - 1) * (ui.L0->height() + 10) >= ui.WfSa->height() - 10) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() - ui.L0->height() - 10);// 删除时自适应滑块
     for (int i = 0; i < 3; i++) {
         QWidget* widget = CsInputLayout->itemAtPosition((SumNum / 3) - 1, i)->widget(); // 获取控件
         if(SumNum / 3 != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
     }
+    
 }
 bool WF3(QString Vn, QString Vt, QString leftText, QString rightText) {
     int isVn = 0, isVt = 0;
