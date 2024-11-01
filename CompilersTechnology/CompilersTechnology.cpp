@@ -31,24 +31,30 @@ void CompilersTechnology::on_stackedWidget_currentChanged(int index) {
 void CompilersTechnology::on_addCS_clicked() {
     int SumNum = CsInputLayout->count();
     // 假设您想放在第一行的第0列、第1列和第2列
+    QLabel* label1 = new QLabel(QString::number(SumNum / 4 + 1) + ".");
+    label1->setObjectName("L" + SumNum / 4);    // 设置对象名称
     QLineEdit* lineEdit1 = new QLineEdit("");// 创建 QLineEdit
-    lineEdit1->setObjectName("L"+ SumNum / 3);    // 设置对象名称
-    QLabel* label = new QLabel("::=");
+    lineEdit1->setObjectName("L"+ SumNum / 4);    // 设置对象名称
+    QLabel* label2 = new QLabel("::=");
+    QFont font = label2->font(); // 获取当前字体
+    font.setPointSize(15); // 设置字体大小为15
+    label2->setFont(font); // 应用修改后的字体
     QLineEdit* lineEdit2 = new QLineEdit("");
-    lineEdit2->setObjectName("R" + SumNum / 3);    // 设置对象名称
+    lineEdit2->setObjectName("R" + SumNum / 4);    // 设置对象名称
 
-    if ((SumNum/3 + 1) * (ui.L0->height() + 10) > ui.WfSa->height()) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() + ui.L0->height() + 10) ;       // 添加时自适应滑块
-    CsInputLayout->addWidget(lineEdit1, SumNum / 3, 0); // 第一行第一列
-    CsInputLayout->addWidget(label, SumNum / 3, 1);     // 第一行第二列
-    CsInputLayout->addWidget(lineEdit2, SumNum /3, 2); // 第一行第三列
+    if ((SumNum/4 + 1) * (ui.L0->height() + 10) > ui.WfSa->height()) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() + ui.L0->height() + 10) ;       // 添加时自适应滑块
+    CsInputLayout->addWidget(label1, SumNum / 4, 0);
+    CsInputLayout->addWidget(lineEdit1, SumNum / 4, 1); // 第一行第一列
+    CsInputLayout->addWidget(label2, SumNum / 4, 2);     // 第一行第二列
+    CsInputLayout->addWidget(lineEdit2, SumNum /4, 3); // 第一行第三列
 
 }
 void CompilersTechnology::on_deleteCS_clicked() {
     int SumNum = CsInputLayout->count();
-    if ((SumNum / 3 - 1) * (ui.L0->height() + 10) >= ui.WfSa->height() - 10) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() - ui.L0->height() - 10);// 删除时自适应滑块
-    for (int i = 0; i < 3; i++) {
-        QWidget* widget = CsInputLayout->itemAtPosition((SumNum / 3) - 1, i)->widget(); // 获取控件
-        if(SumNum / 3 != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
+    if ((SumNum / 4 - 1) * (ui.L0->height() + 10) >= ui.WfSa->height() - 10) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() - ui.L0->height() - 10);// 删除时自适应滑块
+    for (int i = 0; i < 4; i++) {
+        QWidget* widget = CsInputLayout->itemAtPosition((SumNum / 4) - 1, i)->widget(); // 获取控件
+        if(SumNum / 4 != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
     }
     
 }
@@ -119,8 +125,8 @@ void CompilersTechnology::on_chargeCs_clicked() {
         return;
     }
 
-    QLineEdit* test1 = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(0, 0)->widget());
-    QLineEdit* test2 = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(0, 2)->widget());
+    QLineEdit* test1 = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(0, 1)->widget());
+    QLineEdit* test2 = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(0, 3)->widget());
     if(test1->text().isEmpty() || test2->text().isEmpty()) {
         ui.csOutput->setPlainText("输入的文法不正确");
         return;
@@ -129,10 +135,10 @@ void CompilersTechnology::on_chargeCs_clicked() {
     QTextEdit* output = ui.csOutput;
     QString four1 = "G("+ ui.S->text() + ") :\nVn = " + Vn + "\nVt = " + Vt + "\nP:";
     output->setPlainText(four1);
-    for (int i = 0; i < SumNum / 3; i++) {
+    for (int i = 0; i < SumNum / 4; i++) {
         // 读取左边输入框内容
-        QLineEdit* left = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 0)->widget()); // 2表示第三列，索引从0开始
-        QLineEdit* right = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 2)->widget()); // 2表示第三列，索引从0开始
+        QLineEdit* left = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 1)->widget()); // 2表示第三列，索引从0开始
+        QLineEdit* right = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 3)->widget()); // 2表示第三列，索引从0开始
         QString leftText = left->text(); // 获取内容
         QString rightText = right->text(); // 获取内容
         output->append(leftText + " -> " + rightText);
@@ -140,12 +146,21 @@ void CompilersTechnology::on_chargeCs_clicked() {
     output->append("S:" + ui.S->text());
 
     int wf,wf1 = 0, wf2 = 0, wf3 = 0;
-    for (int i = 0; i < SumNum / 3; i++) {
+    bool isEmpty;
+    for (int i = 0; i < SumNum / 4; i++) {
         // 读取左边输入框内容
-        QLineEdit* left = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 0)->widget()); // 2表示第三列，索引从0开始
-        QLineEdit* right = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 2)->widget()); // 2表示第三列，索引从0开始
+        QLineEdit* left = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 1)->widget()); // 2表示第三列，索引从0开始
+        QLineEdit* right = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(i, 3)->widget()); // 2表示第三列，索引从0开始
+        
         QString leftText = left->text(); // 获取内容
         QString rightText = right->text(); // 获取内容
+        // 如果有含空输入的文法
+        isEmpty = false;
+        if (leftText.isEmpty() || rightText.isEmpty()) {
+            isEmpty = true;
+            output->append("第" + QString::number(i + 1) + "行:\t" + leftText + "->" + rightText + "含有空的输入");
+            continue;
+        }
 
         if (WF3(Vn, Vt, leftText, rightText)) {               // 判断3型文法
             wf3++;
@@ -157,10 +172,11 @@ void CompilersTechnology::on_chargeCs_clicked() {
             wf1++;
         }
     }
-    if(wf3 == SumNum / 3) wf = 3;
-    else if(wf2 == SumNum / 3) wf = 2;
-    else if(wf1 == SumNum / 3) wf = 1;
+    if(wf3 == SumNum / 4) wf = 3;
+    else if(wf2 == SumNum / 4) wf = 2;
+    else if(wf1 == SumNum / 4) wf = 1;
     else wf = 0;
+    if(isEmpty) ui.csOutput->append("去除空输入后");
     ui.csOutput->append("文法类型为" + QString::number(wf) + "型文法");
 }
     
