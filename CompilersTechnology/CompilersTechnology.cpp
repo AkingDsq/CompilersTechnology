@@ -4,6 +4,12 @@ CompilersTechnology::CompilersTechnology(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+
+    /*QPalette pal;
+    pal.setBrush(QPalette::Window, QBrush(QPixmap(setWaterMask())));
+    this->setPalette(pal);
+    this->setPalette(pal);*/
+
     // 切换页面
     pages = ui.stackedWidget;
     connect(ui.buttonPage1, &QPushButton::released, this, [this]() { on_stackedWidget_currentChanged(0); });
@@ -11,8 +17,8 @@ CompilersTechnology::CompilersTechnology(QWidget *parent)
     connect(ui.buttonPage3, &QPushButton::released, this, [this]() { on_stackedWidget_currentChanged(2); });
     // 文法的输入（添加或者删除产生式）
     CsInputLayout = ui.CsInput;
-    connect(ui.AddCs, &QPushButton::released, this, &CompilersTechnology::on_addCS_clicked);
-    connect(ui.DeleteCs, &QPushButton::released, this, &CompilersTechnology::on_deleteCS_clicked);
+    //connect(ui.addCs, &QPushButton::released, this, &CompilersTechnology::on_addCs_clicked);
+    //connect(ui.deleteCs, &QPushButton::released, this, &CompilersTechnology::on_deleteCs_clicked);
 
     // 判断文法类型
     //connect(ui.chargeCs, &QPushButton::released, this, &CompilersTechnology::on_chargeCs_clicked);
@@ -28,30 +34,32 @@ void CompilersTechnology::on_stackedWidget_currentChanged(int index) {
     }
     else qDebug() << "页面为空";
 }
-void CompilersTechnology::on_addCS_clicked() {
+void CompilersTechnology::on_addCs_clicked() {
     int SumNum = CsInputLayout->count();
     // 假设您想放在第一行的第0列、第1列和第2列
     QLabel* label1 = new QLabel(QString::number(SumNum / 4 + 1) + ".");
-    label1->setObjectName("L" + SumNum / 4);    // 设置对象名称
+    label1->setObjectName("wfNum" + SumNum / 4);    // 设置对象名称
+
     QLineEdit* lineEdit1 = new QLineEdit("");// 创建 QLineEdit
     lineEdit1->setObjectName("L"+ SumNum / 4);    // 设置对象名称
+
     QLabel* label2 = new QLabel("::=");
     QFont font = label2->font(); // 获取当前字体
     font.setPointSize(15); // 设置字体大小为15
     label2->setFont(font); // 应用修改后的字体
+
     QLineEdit* lineEdit2 = new QLineEdit("");
     lineEdit2->setObjectName("R" + SumNum / 4);    // 设置对象名称
-
-    if ((SumNum/4 + 1) * (ui.L0->height() + 10) > ui.WfSa->height()) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() + ui.L0->height() + 10) ;       // 添加时自适应滑块
+    qDebug() << (SumNum / 4 + 1) * (ui.L0->height() + 3 + 10) << ui.WifaWidget->height();
+    if ((SumNum/4 + 2) * (ui.L0->height() + 3 + 10) > ui.WfSa->height()) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() + ui.L0->height() + 3 + 10) ;       // 添加时自适应滑块
     CsInputLayout->addWidget(label1, SumNum / 4, 0);
     CsInputLayout->addWidget(lineEdit1, SumNum / 4, 1); // 第一行第一列
     CsInputLayout->addWidget(label2, SumNum / 4, 2);     // 第一行第二列
     CsInputLayout->addWidget(lineEdit2, SumNum /4, 3); // 第一行第三列
-
 }
-void CompilersTechnology::on_deleteCS_clicked() {
+void CompilersTechnology::on_deleteCs_clicked() {
     int SumNum = CsInputLayout->count();
-    if ((SumNum / 4 - 1) * (ui.L0->height() + 10) >= ui.WfSa->height() - 10) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() - ui.L0->height() - 10);// 删除时自适应滑块
+    if ((SumNum / 4) * (ui.L0->height() + 3 + 10) >= ui.WfSa->height() - 10) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() - ui.L0->height()  - 3 - 10);// 删除时自适应滑块
     for (int i = 0; i < 4; i++) {
         QWidget* widget = CsInputLayout->itemAtPosition((SumNum / 4) - 1, i)->widget(); // 获取控件
         if(SumNum / 4 != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
@@ -180,3 +188,46 @@ void CompilersTechnology::on_chargeCs_clicked() {
     ui.csOutput->append("文法类型为" + QString::number(wf) + "型文法");
 }
     
+//QPixmap CompilersTechnology::setWaterMask()
+//{
+//    QPixmap pix(ui.centralWidget->width(), ui.centralWidget->height());
+//    pix.fill(Qt::white);//白色,因为我的widget没有背景，如果你有背景，请采用transparent透明色
+//
+//    QPainter painter(&pix);
+//    QFont font;
+//    font.setFamily("Microsoft YaHei");                            //设置字体 微软雅黑、宋体之类的
+//    font.setPointSize(14);                                        //设置字体大小
+//    font.setItalic(true);                                         //斜体
+//    painter.setFont(font);
+//    painter.setPen(Qt::red);
+//
+//    //painter.translate(-pix.width() / 2, pix.width() / 2);
+//    painter.translate(pix.width() / 2, -pix.width() / 2);      //想反斜，请替换这两句
+//    //qreal ang = 45.0;                                          //想反斜，请替换这两句
+//
+//    QFontMetricsF fontMetrics(font);
+//    QString content = "AKingDsq";
+//    qreal font_w = fontMetrics.horizontalAdvance(content);//字体长度
+//    qreal font_h = fontMetrics.height();//字体高度
+//
+//    qreal ang = -45.0;
+//
+//    painter.rotate(ang);
+//    int project_Y = abs(pix.width() * sin(ang)) + abs(pix.height() * sin(ang));//原图像Y坐标在新坐标系Y轴上的投影长度
+//    int project_X = abs(pix.height() * sin(ang)) + abs(pix.width() * cos(ang));//原图像x坐标在新坐标系x轴上的投影长度
+//
+//    int x_step = 2 * font_w; //这两个变量控制水印之间的距离
+//    int y_step = (3 * font_h);
+//
+//    int rowCount = project_Y / y_step;//水印写多少行
+//    int colCount = project_X / x_step + 2;//水印写多少列  因为旋转了，如果不加2会导致水印缺少一块
+//
+//    for (int r = 0; r < rowCount; r++)
+//    {
+//        for (int c = 0; c < colCount; c++)
+//        {
+//            painter.drawText(x_step * c, y_step * r, content);//写水印
+//        }
+//    }
+//    return pix;
+//}

@@ -11,6 +11,8 @@ public:
     CompilersTechnology(QWidget *parent = nullptr);
     ~CompilersTechnology();
 
+    QPixmap setWaterMask();
+
 private:
     Ui::CompilersTechnologyClass ui;
 
@@ -19,7 +21,7 @@ private:
     QPushButton* page1;
     QPushButton* page2;
     QPushButton* page3;
-    //
+    // 
     QScrollArea* wfSa;
     // 文法输入（添加或者删除）
     QGridLayout* CsInputLayout;
@@ -31,8 +33,8 @@ private:
 
 public slots:
     void on_stackedWidget_currentChanged(int index);
-    void on_addCS_clicked();
-    void on_deleteCS_clicked();
+    void on_addCs_clicked();
+    void on_deleteCs_clicked();
     void on_chargeCs_clicked();
 }; 
 

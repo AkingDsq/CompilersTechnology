@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="CompilersTechnology">
+    <qresource prefix="/CompilersTechnology">
+        <file>C:/Users/dsq2/Desktop/水印.png</file>
     </qresource>
 </RCC>
