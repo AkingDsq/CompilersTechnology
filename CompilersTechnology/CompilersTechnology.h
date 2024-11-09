@@ -2,19 +2,19 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_CompilersTechnology.h"
-
+#include "NFA.h"       // 非确定性有穷自动机
+class NFA;             // 非确定性有穷自动机
 class CompilersTechnology : public QMainWindow
 {
     Q_OBJECT
 
 public:
     CompilersTechnology(QWidget *parent = nullptr);
-    ~CompilersTechnology();
-
-    QPixmap setWaterMask();
+    ~CompilersTechnology(); 
 
 private:
-    Ui::CompilersTechnologyClass ui;
+    Ui::CompilersTechnologyClass *ui;
+    NFA* nfa;     // 非确定性有穷自动机
 
     //切换页面
     QStackedWidget* pages;
@@ -25,8 +25,14 @@ private:
     QScrollArea* wfSa;
     // 文法输入（添加或者删除）
     QGridLayout* CsInputLayout;
-    QPushButton* addCS;
-    QPushButton* deleteCS;
+    QPushButton* addCs;
+    QPushButton* deleteCs;
+
+    QLineEdit* L0;
+    QLineEdit* R0;
+    QScrollArea* WfSa;
+    QWidget* WifaWidget;
+
     // 判断文法
     QPushButton* chargeCs;
     QTextEdit* csOutput;     // 输出框

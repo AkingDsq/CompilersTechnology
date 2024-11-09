@@ -2,21 +2,20 @@
 #define LARGE_NUM 100000
 CompilersTechnology::CompilersTechnology(QWidget *parent)
     : QMainWindow(parent)
-{
-    ui.setupUi(this);
-
-    /*QPalette pal;
-    pal.setBrush(QPalette::Window, QBrush(QPixmap(setWaterMask())));
-    this->setPalette(pal);
-    this->setPalette(pal);*/
+    , ui(new Ui::CompilersTechnologyClass)      // 非确定性有穷自动机
+{  
+    ui->setupUi(this);
+    nfa = new NFA(ui);         // 非确定性有穷自动机
+    
+    // 变量初始化
 
     // 切换页面
-    pages = ui.stackedWidget;
-    connect(ui.buttonPage1, &QPushButton::released, this, [this]() { on_stackedWidget_currentChanged(0); });
-    connect(ui.buttonPage2, &QPushButton::released, this, [this]() { on_stackedWidget_currentChanged(1); });
-    connect(ui.buttonPage3, &QPushButton::released, this, [this]() { on_stackedWidget_currentChanged(2); });
+    pages = ui->stackedWidget;
+    connect(ui->buttonPage1, &QPushButton::clicked, this, [this]() { on_stackedWidget_currentChanged(0); });
+    connect(ui->buttonPage2, &QPushButton::clicked, this, [this]() { on_stackedWidget_currentChanged(1); });
+    connect(ui->buttonPage3, &QPushButton::clicked, this, [this]() { on_stackedWidget_currentChanged(2); });
     // 文法的输入（添加或者删除产生式）
-    CsInputLayout = ui.CsInput;
+    CsInputLayout = ui->CsInput;
     //connect(ui.addCs, &QPushButton::released, this, &CompilersTechnology::on_addCs_clicked);
     //connect(ui.deleteCs, &QPushButton::released, this, &CompilersTechnology::on_deleteCs_clicked);
 
@@ -50,8 +49,8 @@ void CompilersTechnology::on_addCs_clicked() {
 
     QLineEdit* lineEdit2 = new QLineEdit("");
     lineEdit2->setObjectName("R" + SumNum / 4);    // 设置对象名称
-    qDebug() << (SumNum / 4 + 1) * (ui.L0->height() + 3 + 10) << ui.WifaWidget->height();
-    if ((SumNum/4 + 2) * (ui.L0->height() + 3 + 10) > ui.WfSa->height()) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() + ui.L0->height() + 3 + 10) ;       // 添加时自适应滑块
+    qDebug() << (SumNum / 4 + 1) * (ui->L0->height() + 3 + 10) << ui->WifaWidget->height();
+    if ((SumNum/4 + 2) * (ui->L0->height() + 3 + 10) > ui->WfSa->height()) ui->WifaWidget->setFixedHeight(ui->WifaWidget->height() + ui->L0->height() + 3 + 10) ;       // 添加时自适应滑块
     CsInputLayout->addWidget(label1, SumNum / 4, 0);
     CsInputLayout->addWidget(lineEdit1, SumNum / 4, 1); // 第一行第一列
     CsInputLayout->addWidget(label2, SumNum / 4, 2);     // 第一行第二列
@@ -59,7 +58,7 @@ void CompilersTechnology::on_addCs_clicked() {
 }
 void CompilersTechnology::on_deleteCs_clicked() {
     int SumNum = CsInputLayout->count();
-    if ((SumNum / 4) * (ui.L0->height() + 3 + 10) >= ui.WfSa->height() - 10) ui.WifaWidget->setFixedHeight(ui.WifaWidget->height() - ui.L0->height()  - 3 - 10);// 删除时自适应滑块
+    if ((SumNum / 4) * (ui->L0->height() + 3 + 10) >= ui->WfSa->height() - 10) ui->WifaWidget->setFixedHeight(ui->WifaWidget->height() - ui->L0->height()  - 3 - 10);// 删除时自适应滑块
     for (int i = 0; i < 4; i++) {
         QWidget* widget = CsInputLayout->itemAtPosition((SumNum / 4) - 1, i)->widget(); // 获取控件
         if(SumNum / 4 != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
@@ -114,34 +113,34 @@ bool WF1(QString Vn, QString Vt, QString leftText, QString rightText) {
     else return false;
 }
 void CompilersTechnology::on_chargeCs_clicked() {
-    ui.csOutput->setPlainText("开始解析文法"); 
+    ui->csOutput->setPlainText("开始解析文法");
     int SumNum = CsInputLayout->count();
     
     // 读取Vn输入框内容
-    QLineEdit* VN = ui.VnInput;
+    QLineEdit* VN = ui->VnInput;
     QString Vn = VN->text();
     // 读取Vt输入框内容
-    QLineEdit* VT = ui.VtInput;
+    QLineEdit* VT = ui->VtInput;
     QString Vt = VT->text();
 
     if(Vn.isEmpty()) {
-        ui.csOutput->setPlainText("Vn不能为空");
+        ui->csOutput->setPlainText("Vn不能为空");
         return;
     }
     else if(Vt.isEmpty()) {
-        ui.csOutput->setPlainText("Vt不能为空");
+        ui->csOutput->setPlainText("Vt不能为空");
         return;
     }
 
     QLineEdit* test1 = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(0, 1)->widget());
     QLineEdit* test2 = qobject_cast<QLineEdit*>(CsInputLayout->itemAtPosition(0, 3)->widget());
     if(test1->text().isEmpty() || test2->text().isEmpty()) {
-        ui.csOutput->setPlainText("输入的文法不正确");
+        ui->csOutput->setPlainText("输入的文法不正确");
         return;
     }
 
-    QTextEdit* output = ui.csOutput;
-    QString four1 = "G("+ ui.S->text() + ") :\nVn = " + Vn + "\nVt = " + Vt + "\nP:";
+    QTextEdit* output = ui->csOutput;
+    QString four1 = "G("+ ui->S->text() + ") :\nVn = " + Vn + "\nVt = " + Vt + "\nP:";
     output->setPlainText(four1);
     for (int i = 0; i < SumNum / 4; i++) {
         // 读取左边输入框内容
@@ -151,7 +150,7 @@ void CompilersTechnology::on_chargeCs_clicked() {
         QString rightText = right->text(); // 获取内容
         output->append(leftText + " -> " + rightText);
     }
-    output->append("S:" + ui.S->text());
+    output->append("S:" + ui->S->text());
 
     int wf,wf1 = 0, wf2 = 0, wf3 = 0;
     bool isEmpty;
@@ -184,50 +183,7 @@ void CompilersTechnology::on_chargeCs_clicked() {
     else if(wf2 == SumNum / 4) wf = 2;
     else if(wf1 == SumNum / 4) wf = 1;
     else wf = 0;
-    if(isEmpty) ui.csOutput->append("去除空输入后");
-    ui.csOutput->append("文法类型为" + QString::number(wf) + "型文法");
+    if(isEmpty) ui->csOutput->append("去除空输入后");
+    ui->csOutput->append("文法类型为" + QString::number(wf) + "型文法");
 }
     
-//QPixmap CompilersTechnology::setWaterMask()
-//{
-//    QPixmap pix(ui.centralWidget->width(), ui.centralWidget->height());
-//    pix.fill(Qt::white);//白色,因为我的widget没有背景，如果你有背景，请采用transparent透明色
-//
-//    QPainter painter(&pix);
-//    QFont font;
-//    font.setFamily("Microsoft YaHei");                            //设置字体 微软雅黑、宋体之类的
-//    font.setPointSize(14);                                        //设置字体大小
-//    font.setItalic(true);                                         //斜体
-//    painter.setFont(font);
-//    painter.setPen(Qt::red);
-//
-//    //painter.translate(-pix.width() / 2, pix.width() / 2);
-//    painter.translate(pix.width() / 2, -pix.width() / 2);      //想反斜，请替换这两句
-//    //qreal ang = 45.0;                                          //想反斜，请替换这两句
-//
-//    QFontMetricsF fontMetrics(font);
-//    QString content = "AKingDsq";
-//    qreal font_w = fontMetrics.horizontalAdvance(content);//字体长度
-//    qreal font_h = fontMetrics.height();//字体高度
-//
-//    qreal ang = -45.0;
-//
-//    painter.rotate(ang);
-//    int project_Y = abs(pix.width() * sin(ang)) + abs(pix.height() * sin(ang));//原图像Y坐标在新坐标系Y轴上的投影长度
-//    int project_X = abs(pix.height() * sin(ang)) + abs(pix.width() * cos(ang));//原图像x坐标在新坐标系x轴上的投影长度
-//
-//    int x_step = 2 * font_w; //这两个变量控制水印之间的距离
-//    int y_step = (3 * font_h);
-//
-//    int rowCount = project_Y / y_step;//水印写多少行
-//    int colCount = project_X / x_step + 2;//水印写多少列  因为旋转了，如果不加2会导致水印缺少一块
-//
-//    for (int r = 0; r < rowCount; r++)
-//    {
-//        for (int c = 0; c < colCount; c++)
-//        {
-//            painter.drawText(x_step * c, y_step * r, content);//写水印
-//        }
-//    }
-//    return pix;
-//}
