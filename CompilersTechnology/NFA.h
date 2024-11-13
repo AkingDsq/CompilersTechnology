@@ -28,6 +28,7 @@ private:
     // 判断文法
     QPushButton* chargeCs2;
     QTextEdit* csOutput2;     // 输出框
+    QTextEdit* csOutput3;      // 输入框
 
 public slots:
     void on_addCs2_clicked();
