@@ -34,13 +34,13 @@ void CompilersTechnology::on_stackedWidget_currentChanged(int index) {
     else qDebug() << "页面为空";
 }
 void CompilersTechnology::on_addCs_clicked() {
-    int SumNum = CsInputLayout->count();
+    int SumNum = CsInputLayout->count()/4;
     // 假设您想放在第一行的第0列、第1列和第2列
-    QLabel* label1 = new QLabel(QString::number(SumNum / 4 + 1) + ".");
-    label1->setObjectName("wfNum" + SumNum / 4);    // 设置对象名称
+    QLabel* label1 = new QLabel(QString::number(SumNum + 1) + ".");
+    label1->setObjectName("wfNum" + SumNum);    // 设置对象名称
 
     QLineEdit* lineEdit1 = new QLineEdit("");// 创建 QLineEdit
-    lineEdit1->setObjectName("L"+ SumNum / 4);    // 设置对象名称
+    lineEdit1->setObjectName("L"+ SumNum);    // 设置对象名称
 
     QLabel* label2 = new QLabel("::=");
     QFont font = label2->font(); // 获取当前字体
@@ -48,20 +48,20 @@ void CompilersTechnology::on_addCs_clicked() {
     label2->setFont(font); // 应用修改后的字体
 
     QLineEdit* lineEdit2 = new QLineEdit("");
-    lineEdit2->setObjectName("R" + SumNum / 4);    // 设置对象名称
-    qDebug() << (SumNum / 4 + 1) * (ui->L0->height() + 3 + 10) << ui->WifaWidget->height();
-    if ((SumNum/4 + 2) * (ui->L0->height() + 3 + 10) > ui->WfSa->height()) ui->WifaWidget->setFixedHeight(ui->WifaWidget->height() + ui->L0->height() + 3 + 10) ;       // 添加时自适应滑块
-    CsInputLayout->addWidget(label1, SumNum / 4, 0);
-    CsInputLayout->addWidget(lineEdit1, SumNum / 4, 1); // 第一行第一列
-    CsInputLayout->addWidget(label2, SumNum / 4, 2);     // 第一行第二列
-    CsInputLayout->addWidget(lineEdit2, SumNum /4, 3); // 第一行第三列
+    lineEdit2->setObjectName("R" + SumNum);    // 设置对象名称
+    qDebug() << (SumNum + 1) * (ui->L0->height() + 3 + 10) << ui->WifaWidget->height();
+    if ((SumNum + 2) * (ui->L0->height() + 3 + 10) > ui->WfSa->height()) ui->WifaWidget->setFixedHeight(ui->WifaWidget->height() + ui->L0->height() + 3 + 10) ;       // 添加时自适应滑块
+    CsInputLayout->addWidget(label1, SumNum, 0);
+    CsInputLayout->addWidget(lineEdit1, SumNum, 1); // 第一行第一列
+    CsInputLayout->addWidget(label2, SumNum, 2);     // 第一行第二列
+    CsInputLayout->addWidget(lineEdit2, SumNum, 3); // 第一行第三列
 }
 void CompilersTechnology::on_deleteCs_clicked() {
-    int SumNum = CsInputLayout->count();
-    if ((SumNum / 4) * (ui->L0->height() + 3 + 10) >= ui->WfSa->height() - 10) ui->WifaWidget->setFixedHeight(ui->WifaWidget->height() - ui->L0->height()  - 3 - 10);// 删除时自适应滑块
+    int SumNum = CsInputLayout->count()/4;
+    if ((SumNum) * (ui->L0->height() + 3 + 10) >= ui->WfSa->height() - 10) ui->WifaWidget->setFixedHeight(ui->WifaWidget->height() - ui->L0->height()  - 3 - 10);// 删除时自适应滑块
     for (int i = 0; i < 4; i++) {
-        QWidget* widget = CsInputLayout->itemAtPosition((SumNum / 4) - 1, i)->widget(); // 获取控件
-        if(SumNum / 4 != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
+        QWidget* widget = CsInputLayout->itemAtPosition((SumNum) - 1, i)->widget(); // 获取控件
+        if(SumNum != 1) CsInputLayout->removeWidget(widget); // 第一行第一列
     }
     
 }
