@@ -3,7 +3,9 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_CompilersTechnology.h"
 #include "NFA.h"       // 非确定性有穷自动机
+#include "LexicalAnalysis.h"   // 词法分析器
 class NFA;             // 非确定性有穷自动机
+class LexicalAnalysis;   // 词法分析器
 class CompilersTechnology : public QMainWindow
 {
     Q_OBJECT
@@ -15,6 +17,7 @@ public:
 private:
     Ui::CompilersTechnologyClass *ui;
     NFA* nfa;     // 非确定性有穷自动机
+    LexicalAnalysis* lexicalAnalysis;   // 词法分析器
 
     //切换页面
     QStackedWidget* pages;

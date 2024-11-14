@@ -85,13 +85,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LexicalAnalysis.cpp" />
     <ClCompile Include="NFA.cpp" />
     <QtRcc Include="CompilersTechnology.qrc" />
     <QtUic Include="CompilersTechnology.ui" />
@@ -103,6 +104,7 @@
     <QtMoc Include="NFA.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="LexicalAnalysis.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

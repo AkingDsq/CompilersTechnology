@@ -43,9 +43,15 @@
     <ClCompile Include="NFA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LexicalAnalysis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="NFA.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="LexicalAnalysis.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -2,10 +2,11 @@
 #define LARGE_NUM 100000
 CompilersTechnology::CompilersTechnology(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::CompilersTechnologyClass)      // 非确定性有穷自动机
+    , ui(new Ui::CompilersTechnologyClass)      // 非确定性有穷自动机)
 {  
     ui->setupUi(this);
     nfa = new NFA(ui);         // 非确定性有穷自动机
+    lexicalAnalysis = new LexicalAnalysis(ui);
     
     // 变量初始化
 
