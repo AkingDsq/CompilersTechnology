@@ -6,6 +6,7 @@
 #include "LexicalAnalysis.h"   // 词法分析器
 class NFA;             // 非确定性有穷自动机
 class LexicalAnalysis;   // 词法分析器
+
 class CompilersTechnology : public QMainWindow
 {
     Q_OBJECT
