@@ -863,9 +863,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="textFormat">
      <enum>Qt::TextFormat::RichText</enum>
     </property>
-    <property name="pixmap">
-     <pixmap resource="CompilersTechnology.qrc">:/CompilersTechnology/C:/Users/dsq2/Desktop/水印.png</pixmap>
-    </property>
     <property name="scaledContents">
      <bool>true</bool>
     </property>

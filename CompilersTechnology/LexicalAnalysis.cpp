@@ -1,4 +1,4 @@
-#include "LexicalAnalysis.h"
+ï»¿#include "LexicalAnalysis.h"
 #include "CompilersTechnology.h"
 
 #define KEYWORD         1
@@ -8,10 +8,10 @@
 #define CONSTINTEGRAL   5
 #define ELSE            0
 
-// ¹Ø¼ü´ÊÁĞ±í£¬½çÏŞ·ûÁĞ±í¡¢ÔËËã·ûÁĞ±í
-QString keyWord[] = { "void", "int", "char", "main", "return", "if", "else" };
+// å…³é”®è¯åˆ—è¡¨ï¼Œç•Œé™ç¬¦åˆ—è¡¨ã€è¿ç®—ç¬¦åˆ—è¡¨
+QString keyWord[] = { "void", "int", "char", "main", "return", "if", "else" , "float", "string", "for", "while"};
 QString delimiter[] = { "(", ")", "[", "]", "{", "}", ";", "," };
-QString operator0[] = { "+", "-", "*", "/", "%", "=" ,">", "<"};
+QString operator0[] = { "+", "-", "*", "/", "%", "=" ,">", "<", "|", "&"};
 
 LexicalAnalysis::LexicalAnalysis(Ui::CompilersTechnologyClass* ui)
     : ui(ui)
@@ -26,7 +26,7 @@ LexicalAnalysis::LexicalAnalysis(Ui::CompilersTechnologyClass* ui)
 LexicalAnalysis::~LexicalAnalysis()
 {}
 
-// ¼ì²â char ÖĞ×Ö·ûÊÇ·ñÎª×ÖÄ¸
+// æ£€æµ‹ char ä¸­å­—ç¬¦æ˜¯å¦ä¸ºå­—æ¯
 bool Letter(QChar c)
 {
     if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
@@ -36,7 +36,7 @@ bool Letter(QChar c)
     return false;
 }
 
-// ¼ì²âµ¥´ÊÊÇ·ñÎª¹Ø¼ü×Ö
+// æ£€æµ‹å•è¯æ˜¯å¦ä¸ºå…³é”®å­—
 bool KeyWord(QString str)
 {
     for (QString p : keyWord)
@@ -47,7 +47,7 @@ bool KeyWord(QString str)
     return false;
 }
 
-// ÅĞ¶Ïµ¥´ÊÊÇ·ñÊÇ½çÏŞ·û
+// åˆ¤æ–­å•è¯æ˜¯å¦æ˜¯ç•Œé™ç¬¦
 bool Delimiter(QString str)
 {
     for (QString p : delimiter)
@@ -58,7 +58,7 @@ bool Delimiter(QString str)
     return false;
 }
 
-// ÅĞ¶Ïµ¥´ÊÊÇ·ñÊÇÔËËã·û
+// åˆ¤æ–­å•è¯æ˜¯å¦æ˜¯è¿ç®—ç¬¦
 bool Operator(QString str)
 {
     for (QString p : operator0)
@@ -69,7 +69,7 @@ bool Operator(QString str)
     return false;
 }
 
-// ÅĞ¶Ï×Ö·ûÊÇ·ñÎªÊı×Ö
+// åˆ¤æ–­å­—ç¬¦æ˜¯å¦ä¸ºæ•°å­—
 bool Digit(QChar c)
 {
     if (c >= '0' && c <= '9')
@@ -80,7 +80,7 @@ bool Digit(QChar c)
 }
 
 
-// ÓÉ token ²é±£Áô×Ö±í£¬Èô token ÖĞ×Ö·û´®Îª±£Áô×Ö·ûÔò·µ»ØÆäÀà±ğ±àÂë£¬·ñÔò·µ»ØÖµÎª0
+// ç”± token æŸ¥ä¿ç•™å­—è¡¨ï¼Œè‹¥ token ä¸­å­—ç¬¦ä¸²ä¸ºä¿ç•™å­—ç¬¦åˆ™è¿”å›å…¶ç±»åˆ«ç¼–ç ï¼Œå¦åˆ™è¿”å›å€¼ä¸º0
 int Reserve(QString str)
 {
     int type = ELSE;
@@ -97,14 +97,14 @@ int Reserve(QString str)
     else if (Digit(str[0]))
         type = CONSTINTEGRAL;
 
-    // ±êÊ¶·û
+    // æ ‡è¯†ç¬¦
     else if (str[0] == '_' || Letter(str[0]))
     {
         type = IDENTIFIER;
         {
             for (int i = 1; i < str.length(); i++)
             {
-                // Èô²»·ûºÏ±êÊ¶·û¹æÔò£¬Ôòtype=0
+                // è‹¥ä¸ç¬¦åˆæ ‡è¯†ç¬¦è§„åˆ™ï¼Œåˆ™type=0
                 if (!(str[i] == '_' || Letter(str[i]) || Digit(str[i])))
                 {
                     type = ELSE;
@@ -121,44 +121,44 @@ int Reserve(QString str)
 
 void LexicalAnalysis::on_chargeCs4_clicked()
 {
-    // Çå¿ÕÊä³ö¿ò
+    // æ¸…ç©ºè¾“å‡ºæ¡†
     csOutput4->clear();
     csOutput4->setPlainText("");
-    // ¶ÁÈ¡Ô´´úÂë½«¿Õ¸ñºÍ»Ø³µÉ¾³ı
+    // è¯»å–æºä»£ç å°†ç©ºæ ¼å’Œå›è½¦åˆ é™¤
     QString token = csInPut4->toPlainText();
 
-    // str ´æÈëÒ»¸öµ¥´Ê
+    // str å­˜å…¥ä¸€ä¸ªå•è¯
     QString str = "";
     int i = 0;
 
-    // ÒÀ´Î±éÀúÔ´´úÂëÖĞµÄÃ¿Ò»¸ö×Ö·û
+    // ä¾æ¬¡éå†æºä»£ç ä¸­çš„æ¯ä¸€ä¸ªå­—ç¬¦
     while (i < token.length())
     {
         str = "";
-        // Êı×Ö¿ªÍ·
+        // æ•°å­—å¼€å¤´
         if (Digit(token[i]))
         {
             while (Digit(token[i])) {
                 str = str + token[i++];
-                // ´òÓ¡·ÖÀà½á¹û
+                // æ‰“å°åˆ†ç±»ç»“æœ
                 csOutput4->moveCursor(QTextCursor::End);
                 csOutput4->insertPlainText('(' + QString::number(Reserve(str)) + '"' + str + '"' + ')' + '\n');
             }
         }
-        // ÏÂ»®Ïß»òÕß×ÖÄ¸¿ªÍ·µÄµ¥´Ê£¬¼´±êÊ¶·û»òÕß¹Ø¼ü×Ö
+        // ä¸‹åˆ’çº¿æˆ–è€…å­—æ¯å¼€å¤´çš„å•è¯ï¼Œå³æ ‡è¯†ç¬¦æˆ–è€…å…³é”®å­—
         else if (token[i] == '_' || Letter(token[i]))
         {
             while (token[i] == '_' || Letter(token[i]) || Digit(token[i]))
             {
                 str = str + token[i++];
-                // Èç¹ûÊÇ¹Ø¼ü×Ö£¬Á¢¼´½áÊø
+                // å¦‚æœæ˜¯å…³é”®å­—ï¼Œç«‹å³ç»“æŸ
                 if (Reserve(str) == KEYWORD)
                     break;
             }
             csOutput4->moveCursor(QTextCursor::End);
             csOutput4->insertPlainText('(' + QString::number(Reserve(str)) + '"' + str + '"' + ')' + '\n');
         }
-        // ÔËËã·û
+        // è¿ç®—ç¬¦
         else {
             str = str + token[i++];
             csOutput4->moveCursor(QTextCursor::End);

@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QtWidgets/QMainWindow>
 #include "ui_CompilersTechnology.h"
-#include "NFA.h"       // ·ÇÈ·¶¨ĞÔÓĞÇî×Ô¶¯»ú
-#include "LexicalAnalysis.h"   // ´Ê·¨·ÖÎöÆ÷
-class NFA;             // ·ÇÈ·¶¨ĞÔÓĞÇî×Ô¶¯»ú
-class LexicalAnalysis;   // ´Ê·¨·ÖÎöÆ÷
+#include "NFA.h"       // éç¡®å®šæ€§æœ‰ç©·è‡ªåŠ¨æœº
+#include "LexicalAnalysis.h"   // è¯æ³•åˆ†æå™¨
+class NFA;             // éç¡®å®šæ€§æœ‰ç©·è‡ªåŠ¨æœº
+class LexicalAnalysis;   // è¯æ³•åˆ†æå™¨
 
 class CompilersTechnology : public QMainWindow
 {
@@ -17,17 +17,17 @@ public:
 
 private:
     Ui::CompilersTechnologyClass *ui;
-    NFA* nfa;     // ·ÇÈ·¶¨ĞÔÓĞÇî×Ô¶¯»ú
-    LexicalAnalysis* lexicalAnalysis;   // ´Ê·¨·ÖÎöÆ÷
+    NFA* nfa;     // éç¡®å®šæ€§æœ‰ç©·è‡ªåŠ¨æœº
+    LexicalAnalysis* lexicalAnalysis;   // è¯æ³•åˆ†æå™¨
 
-    //ÇĞ»»Ò³Ãæ
+    //åˆ‡æ¢é¡µé¢
     QStackedWidget* pages;
     QPushButton* page1;
     QPushButton* page2;
     QPushButton* page3;
     // 
     QScrollArea* wfSa;
-    // ÎÄ·¨ÊäÈë£¨Ìí¼Ó»òÕßÉ¾³ı£©
+    // æ–‡æ³•è¾“å…¥ï¼ˆæ·»åŠ æˆ–è€…åˆ é™¤ï¼‰
     QGridLayout* CsInputLayout;
     QPushButton* addCs;
     QPushButton* deleteCs;
@@ -37,9 +37,9 @@ private:
     QScrollArea* WfSa;
     QWidget* WifaWidget;
 
-    // ÅĞ¶ÏÎÄ·¨
+    // åˆ¤æ–­æ–‡æ³•
     QPushButton* chargeCs;
-    QTextEdit* csOutput;     // Êä³ö¿ò
+    QTextEdit* csOutput;     // è¾“å‡ºæ¡†
 
 public slots:
     void on_stackedWidget_currentChanged(int index);
