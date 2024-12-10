@@ -4,8 +4,12 @@
 #include "ui_CompilersTechnology.h"
 #include "NFA.h"       // 非确定性有穷自动机
 #include "LexicalAnalysis.h"   // 词法分析器
+#include "LL1.h"            // LL(1)分析表
+//#include "LR1.h"            // LR(1)分析表
+//#include "LR0.h"            // LR(0)分析表
 class NFA;             // 非确定性有穷自动机
 class LexicalAnalysis;   // 词法分析器
+class LL1;
 
 class CompilersTechnology : public QMainWindow
 {
@@ -19,12 +23,16 @@ private:
     Ui::CompilersTechnologyClass *ui;
     NFA* nfa;     // 非确定性有穷自动机
     LexicalAnalysis* lexicalAnalysis;   // 词法分析器
+    LL1* ll1;     // LL(1)分析表
 
     //切换页面
     QStackedWidget* pages;
-    QPushButton* page1;
-    QPushButton* page2;
-    QPushButton* page3;
+    //菜单栏
+    QAction* page1;
+    QAction* page2;
+    QAction* page3;
+    QAction* page4;
+
     // 
     QScrollArea* wfSa;
     // 文法输入（添加或者删除）

@@ -7,14 +7,18 @@ CompilersTechnology::CompilersTechnology(QWidget *parent)
     ui->setupUi(this);
     nfa = new NFA(ui);         // 非确定性有穷自动机
     lexicalAnalysis = new LexicalAnalysis(ui);
-    
-    // 变量初始化
+    ll1 = new LL1(ui);         // LL(1)分析表
 
     // 切换页面
     pages = ui->stackedWidget;
-    connect(ui->buttonPage1, &QPushButton::clicked, this, [this]() { on_stackedWidget_currentChanged(0); });
-    connect(ui->buttonPage2, &QPushButton::clicked, this, [this]() { on_stackedWidget_currentChanged(1); });
-    connect(ui->buttonPage3, &QPushButton::clicked, this, [this]() { on_stackedWidget_currentChanged(2); });
+    page1 = ui->page1;
+    page2 = ui->page2;
+    page3 = ui->page3;
+    page4 = ui->page4;
+    connect(page1, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(0); });
+    connect(page2, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(1); });
+    connect(page3, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(2); });
+    connect(page4, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(3); });
     // 文法的输入（添加或者删除产生式）
     CsInputLayout = ui->CsInput;
     //connect(ui.addCs, &QPushButton::released, this, &CompilersTechnology::on_addCs_clicked);
