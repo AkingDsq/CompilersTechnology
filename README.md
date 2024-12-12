@@ -61,3 +61,6 @@ Enigma Virtual Box是一个打包程序的第三方软件，可以把程序以�
 
 ## NFA确定化功能预览图
 ![NFA确定化预览图](https://github.com/AkingDsq/CompilersTechnology/blob/master/img/NFA确定化预览图.png)
+
+## LL（1）分析法功能预览图
+![LL（1）分析法](https://github.com/AkingDsq/CompilersTechnology/blob/master/img/LL（1）分析法.png)
