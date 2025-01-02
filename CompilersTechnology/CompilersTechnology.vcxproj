@@ -108,6 +108,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Compiler.cpp" />
     <ClCompile Include="LexicalAnalysis.cpp" />
     <ClCompile Include="LL1.cpp" />
     <ClCompile Include="LR0.cpp" />
@@ -124,6 +125,7 @@
   <ItemGroup>
     <QtMoc Include="LexicalAnalysis.h" />
     <QtMoc Include="LL1.h" />
+    <QtMoc Include="Compiler.h" />
     <ClInclude Include="LR0.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

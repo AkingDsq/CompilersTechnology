@@ -8,17 +8,19 @@ CompilersTechnology::CompilersTechnology(QWidget *parent)
     nfa = new NFA(ui);         // 非确定性有穷自动机
     lexicalAnalysis = new LexicalAnalysis(ui);
     ll1 = new LL1(ui);         // LL(1)分析表
-
+    compiler = new Compiler(ui);
     // 切换页面
     pages = ui->stackedWidget;
     page1 = ui->page1;
     page2 = ui->page2;
     page3 = ui->page3;
     page4 = ui->page4;
+    page5 = ui->Compiler;
     connect(page1, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(0); });
     connect(page2, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(1); });
     connect(page3, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(2); });
     connect(page4, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(3); });
+    connect(page5, &QAction::triggered, this, [this]() { on_stackedWidget_currentChanged(4); });
     // 文法的输入（添加或者删除产生式）
     CsInputLayout = ui->CsInput;
     //connect(ui.addCs, &QPushButton::released, this, &CompilersTechnology::on_addCs_clicked);

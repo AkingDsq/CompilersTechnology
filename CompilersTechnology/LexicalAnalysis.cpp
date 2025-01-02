@@ -8,10 +8,23 @@
 #define CONSTINTEGRAL   5
 #define ELSE            0
 
+struct identifier {   // 保存的标识符信息
+    int token;        // 该标识符返回的标记
+    int hash;
+    QString name;     // 存放标识符本身的字符串
+    int _class;       // 该标识符的类别，如数字，全局变量或局部变量等。
+    int type;         // 标识符的类型，即如果它是个变量，变量是 int 型、char 型还是指针型。
+    int value;        // 存放这个标识符的值，如标识符是函数，刚存放函数的地址。
+    int Bclass;       // C 语言中标识符可以是全局的也可以是局部的，当局部标识符的名字与全局标识符相同时，用作保存全局标识符的信息。
+    int Btype;
+    int Bvalue;
+};
+QVector<identifier> identifierList;  // 标识符列表
+
 // 关键词列表，界限符列表、运算符列表
 QString keyWord[] = { "void", "int", "char", "main", "return", "if", "else" , "float", "string", "for", "while"};
-QString delimiter[] = { "(", ")", "[", "]", "{", "}", ";", "," };
-QString operator0[] = { "+", "-", "*", "/", "%", "=" ,">", "<", "|", "&"};
+QString delimiter[] = { "(", ")", "[", "]", "{", "}", ";", "," ,"?", ":"};
+QString operator0[] = { "+", "-", "*", "/", "%", "=" ,">", "<", "|", "&", "&&", "||", "=="};
 
 LexicalAnalysis::LexicalAnalysis(Ui::CompilersTechnologyClass* ui)
     : ui(ui)

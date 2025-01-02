@@ -5,11 +5,13 @@
 #include "NFA.h"       // 非确定性有穷自动机
 #include "LexicalAnalysis.h"   // 词法分析器
 #include "LL1.h"            // LL(1)分析表
+#include "Compiler.h"       // 编译器
 //#include "LR1.h"            // LR(1)分析表
 //#include "LR0.h"            // LR(0)分析表
 class NFA;             // 非确定性有穷自动机
 class LexicalAnalysis;   // 词法分析器
 class LL1;
+class Compiler;
 
 class CompilersTechnology : public QMainWindow
 {
@@ -24,6 +26,7 @@ private:
     NFA* nfa;     // 非确定性有穷自动机
     LexicalAnalysis* lexicalAnalysis;   // 词法分析器
     LL1* ll1;     // LL(1)分析表
+    Compiler* compiler;
 
     //切换页面
     QStackedWidget* pages;
@@ -32,7 +35,7 @@ private:
     QAction* page2;
     QAction* page3;
     QAction* page4;
-
+    QAction* page5;
     // 
     QScrollArea* wfSa;
     // 文法输入（添加或者删除）
