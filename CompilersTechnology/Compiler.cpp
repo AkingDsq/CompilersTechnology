@@ -5,6 +5,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QStack>
+#include <algorithm>
+
 
 Compiler::Compiler(Ui::CompilersTechnologyClass* ui)
     : ui(ui)
@@ -77,6 +79,7 @@ void Compiler::loadFile() {
 // 词法分析输出
 struct LexicalAnalysis_Output {   // 保存的标识符信息
     int token;        // 该标识符返回的标记
+    int line;         // 返回行号
     QString name;     // 存放标识符本身的字符串
 };
 QVector<LexicalAnalysis_Output> lexicalAnalysis_Output;  // 标识符列表
@@ -243,8 +246,12 @@ void Compiler::lexicalAnalysis()
 
     int line = 1;   // 行号
     // 清空输出框
-    csOutPut5->clear();
-    csOutPut5->setPlainText("");
+    /*csOutPut5->clear();
+    csOutPut5->setPlainText("");*/
+
+    error5->clear();
+    error5->setPlainText("");
+
     // 读取源代码将空格和回车删除
     QString token = csInPut5->toPlainText();
     token.remove(QChar(' '));
@@ -266,10 +273,14 @@ void Compiler::lexicalAnalysis()
                 LexicalAnalysis_Output temp_lexicalAnalysis_Output;
                 temp_lexicalAnalysis_Output.token = Reserve2(str);
                 temp_lexicalAnalysis_Output.name = str;
+                temp_lexicalAnalysis_Output.line = line;
                 lexicalAnalysis_Output.append(temp_lexicalAnalysis_Output);
                 // 打印分类结果
-                csOutPut5->moveCursor(QTextCursor::End);
-                csOutPut5->insertPlainText('(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');
+                /*csOutPut5->moveCursor(QTextCursor::End);
+                csOutPut5->insertPlainText(QString::number(temp_lexicalAnalysis_Output.line) + ',' + '(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');*/
+                
+                error5->moveCursor(QTextCursor::End);
+                error5->insertPlainText(QString::number(temp_lexicalAnalysis_Output.line) + ',' + '(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');
             }
         }
         // 下划线或者字母开头的单词，即标识符或者关键字
@@ -285,9 +296,12 @@ void Compiler::lexicalAnalysis()
             LexicalAnalysis_Output temp_lexicalAnalysis_Output;
             temp_lexicalAnalysis_Output.token = Reserve2(str);
             temp_lexicalAnalysis_Output.name = str;
+            temp_lexicalAnalysis_Output.line = line;
             lexicalAnalysis_Output.append(temp_lexicalAnalysis_Output);
-            csOutPut5->moveCursor(QTextCursor::End);
-            csOutPut5->insertPlainText('(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');
+            /*csOutPut5->moveCursor(QTextCursor::End);
+            csOutPut5->insertPlainText(QString::number(temp_lexicalAnalysis_Output.line) + ',' + '(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');*/
+            error5->moveCursor(QTextCursor::End);
+            error5->insertPlainText(QString::number(temp_lexicalAnalysis_Output.line) + ',' + '(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');
         }
         else if (token[i] == '\n') {
             line++;
@@ -300,14 +314,18 @@ void Compiler::lexicalAnalysis()
             // 保存表格
             LexicalAnalysis_Output temp_lexicalAnalysis_Output;
             temp_lexicalAnalysis_Output.token = Reserve2(str);
-            if (Reserve2(str) == 17) {
-                temp_lexicalAnalysis_Output.name = "b";
-            }
-            else temp_lexicalAnalysis_Output.name = str;
+            //if (Reserve2(str) == 17) {
+            //    temp_lexicalAnalysis_Output.name = "b";
+            //}
+            temp_lexicalAnalysis_Output.name = str;
+            temp_lexicalAnalysis_Output.line = line;
             lexicalAnalysis_Output.append(temp_lexicalAnalysis_Output);
             // 
-            csOutPut5->moveCursor(QTextCursor::End);
-            csOutPut5->insertPlainText('(' + QString::number(Reserve2(str)) + '"' + temp_lexicalAnalysis_Output.name + '"' + ')' + '\n');
+            /*csOutPut5->moveCursor(QTextCursor::End);
+            csOutPut5->insertPlainText(QString::number(temp_lexicalAnalysis_Output.line) + ',' + '(' + QString::number(Reserve2(str)) + '"' + temp_lexicalAnalysis_Output.name + '"' + ')' + '\n');*/
+        
+            error5->moveCursor(QTextCursor::End);
+            error5->insertPlainText(QString::number(temp_lexicalAnalysis_Output.line) + ',' + '(' + QString::number(Reserve2(str)) + '"' + str + '"' + ')' + '\n');
         }
     }
 }
@@ -318,8 +336,7 @@ void Compiler::lexicalAnalysis()
 struct LL1Input2 {
     QString L;
     QString R;
-    bool haveEmpty = 0;      // 是否有空产生式
-    bool isFix = 0;          // 产生式是否修改过
+
 };
 // LL（1）分析表结构体
 struct LL1Table2 {
@@ -335,6 +352,79 @@ struct LL1Output2 {
     QStack<QString> input_stack;
     QString use;
 };
+// 
+struct Symbol
+{
+    QString varName;       //变量名
+    QString valueStr{ "0" }; //变量的值，字符串形式,初始化为0
+    int PLACE{ -1 };        //该变量在符号表中的位置,初始化为-1
+};
+struct FourYuanFormula
+{                  //四元式结构体
+    QString op;     //操作符
+    int arg1Index; //源操作数1的符号表地址
+    int arg2Index; //源操作数2的符号表地址
+    Symbol result; //目的操作数
+};
+QVector<FourYuanFormula> formula; //四元式序列
+QVector<Symbol> symbolTable;      //符号表
+QMap<QString, int> ENTRY;          //用于查变量的符号表入口地址
+int tempVarNum = 0;              //临时变量个数
+Symbol newtemp()
+{ //生成新的临时变量
+    tempVarNum++;
+    return Symbol{ "T" + QString::number(tempVarNum) };
+}
+
+void GEN(QString op, int arg1, int arg2, Symbol& result)
+{ //运算符、参数1在符号表的编号、参数2在符号表的编号，结果符号
+    //产生一个四元式，并填入四元式序列表
+    QString op_str = "";
+    op_str = "(" + op + ",";
+    arg1 != -1 ? op_str.append( symbolTable[arg1].varName) : op_str.append("_");
+    op_str.append(",");
+    arg2 != -1 ? op_str.append(symbolTable[arg2].varName) : op_str.append("_");
+    op_str.append("," + result.varName + ")" );
+    formula.push_back(FourYuanFormula{ op, arg1, arg2, result }); //插入到四元式序列中
+    if (op == "@")
+    { //将临时变量result注册进入符号表
+        result.varName;
+        result.PLACE = symbolTable.size();
+        result.valueStr = "-" + symbolTable[arg1].valueStr;
+        symbolTable.push_back(result);
+        ENTRY[result.varName] = result.PLACE;
+    }
+    if (op == "+")
+    { //将临时变量result注册进入符号表
+        result.PLACE = symbolTable.size();
+        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() + symbolTable[arg2].valueStr.toInt());
+        symbolTable.push_back(result);
+        ENTRY[result.varName] = result.PLACE;
+    }
+    if (op == "-")
+    { //将临时变量result注册进入符号表
+        result.PLACE = symbolTable.size();
+        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() - symbolTable[arg2].valueStr.toInt());
+        symbolTable.push_back(result);
+        ENTRY[result.varName] = result.PLACE;
+    }
+    if (op == "*")
+    { //将临时变量result注册进入符号表
+        result.PLACE = symbolTable.size();
+        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() * symbolTable[arg2].valueStr.toInt());
+        symbolTable.push_back(result);
+        ENTRY[result.varName] = result.PLACE;
+    }
+    if (op == "/")
+    { //将临时变量result注册进入符号表
+        result.PLACE = symbolTable.size();
+        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() / symbolTable[arg2].valueStr.toInt());
+        symbolTable.push_back(result);
+        ENTRY[result.varName] = result.PLACE;
+    }
+    if (op == "=") //这个result不是临时变量了，故不用注册进入符号表，只进行绑定
+        result.valueStr = symbolTable[arg1].valueStr;
+}
 
 // 文法输入表
 QVector<LL1Input2> Input_all2
@@ -789,14 +879,517 @@ void Compiler::syntaxAnalysis() {
 //---------------------------语法分析----------------------//
 
 //---------------------------语义分析----------------------//
-void Compiler::semanticAnalysis() {
+// 临时变量
+struct Temp_num {
+    QString name;
+    QString arg1;
+    QString arg2 = "";
+    QString res;
+};
+QVector<Temp_num> temp_num;    // 保存的临时变量列表
 
+// 四元式
+struct four_address_code {
+    QString op;
+    QString arg1;
+    QString arg2 = "";
+    QString res;
+    int Block;
+    QString type;
+};
+QVector<four_address_code> four_address_code_all;
+// 语法块
+QVector<QString> blockNumber;  // 保存的语法块列表
+// 划分行
+void Block() {
+    int line = 1;
+    QString temp;
+    for (int i = 0; i < lexicalAnalysis_Output.size(); i++) {
+        if (lexicalAnalysis_Output[i].line == line) {
+            temp.append(lexicalAnalysis_Output[i].name);
+        }
+        else {
+            blockNumber.push_back(temp);
+            line++;
+            temp.clear();
+            temp.append(lexicalAnalysis_Output[i].name);
+        }
+    }
+}
+
+//给运算符优先级排序
+int prio(QChar op) {                 
+    int priority;
+    if (op == '*' || op == '/')
+        priority = 4;
+    if (op == '+' || op == '-')
+        priority = 3;
+    if (op == '(')
+        priority = 2;
+    if (op == '=' || op == '>' || op == '<') {
+        priority = 1;
+    }
+    return priority;
+}
+// 转化后缀表达式
+QString Trans(QString str) {   //引用传递
+    QString str1;
+    QStack<QChar> ts;                   //定义一个char类型的栈s
+    int i;
+    for (i = 0; i < str.size(); i++) {
+        if (str[i] >= '0' && str[i] <= '9' || str[i] >= 'a' && str[i] <= 'z') {    //如果是数字或字母，直接入中缀表达式
+            str1 += str[i];
+        }
+        else {                        //否则不是数字
+            if (ts.empty())            //栈空则入站
+                ts.push(str[i]);
+            else if (str[i] == '(')   //左括号入栈
+                ts.push(str[i]);
+            else if (str[i] == ')') {  //如果是右括号，只要栈顶不是左括号，就弹出并输出
+                while (ts.top() != '(') {
+                    str1 += ts.top();
+                    ts.pop();
+                }
+                ts.pop();                 //弹出左括号，但不输出
+            }
+            else {
+                while (prio(str[i]) <= prio(ts.top())) { //栈顶优先级大于等于当前运算符，则输出
+                    str1 += ts.top();
+                    ts.pop();
+                    if (ts.empty())      //栈为空，停止
+                        break;
+                }
+                ts.push(str[i]);   //把当前运算符入栈
+            }
+        }
+    }
+    while (!ts.empty()) {      //最后，如果栈不空，则弹出所有元素并输出
+        str1 += ts.top();
+        ts.pop();
+    }
+    return str1;
+}
+int temp_num_count = 0;
+// 真链
+QVector<int> True1;
+QVector<int> True2;
+// 假链
+QVector<int> Flase;
+// 生成四元式
+// 块号
+void Gen(int start, int end) {
+    
+    // 四元式生成
+    for (int i = start; i <= end; i++) {
+        if (blockNumber[i].contains("if")) {
+            // 清空真链假链
+            True1.clear();
+            True2.clear();
+            Flase.clear();
+
+            int l = KMP2(blockNumber[i], "(")[0] + 1;
+            int r = KMP2(blockNumber[i], ")")[0] - 1;
+            QString back = Trans(blockNumber[i].mid(l, r - l + 1));
+
+            QStack<QString> tmp;
+            for (int j = 0; j < back.size(); j++) {
+                if (back[j] >= 'a' && back[j] <= 'z' || back[j] >= '0' && back[j] <= '9') {
+                    tmp.push(back[j]);
+                }
+                else if (back[j] == '<' || back[j] == '>') {
+                    four_address_code code;
+                    code.op = 'J' + back[j];
+                    code.arg2 = tmp.top();
+                    tmp.pop();
+                    code.arg1 = tmp.top();
+                    tmp.pop();
+                    code.res = "";
+                    code.type = "if";
+                    four_address_code_all.push_back(code);
+                    True1.push_back(four_address_code_all.size() - 1); // 真链
+                }
+                else {
+                    four_address_code code;
+                    code.op = back[j];
+                    code.arg2 = tmp.top();
+                    tmp.pop();
+                    code.arg1 = tmp.top();
+                    tmp.pop();
+                    QString temp_name = "T" + QString::number(temp_num_count);
+                    code.res = temp_name;
+                    temp_num_count++;
+                    tmp.push(temp_name);
+                    code.type = "if";
+                    four_address_code_all.push_back(code);
+                }
+            }
+            four_address_code code;
+            code.op = 'J';
+            code.arg2 = " ";
+            code.arg1 = " ";
+            code.res = "";
+            four_address_code_all.push_back(code);
+            True2.push_back(four_address_code_all.size() - 1); // 真2链
+            // 回填真链1
+            four_address_code_all[True1[0]].res = QString::number(four_address_code_all.size() + 1);
+            // if
+            int temp_end = 0;
+            for (int j = i + 1;j < blockNumber.size(); j++) {
+                if (blockNumber[j].contains('}')) {
+                    temp_end = j - 1;
+                    break;
+                }
+            }
+            Gen(i + 1, temp_end);
+            
+            code.op = 'J';
+            code.arg2 = " ";
+            code.arg1 = " ";
+            code.res = "";
+            four_address_code_all.push_back(code);
+            Flase.push_back(four_address_code_all.size() - 1);
+            i = temp_end + 2;
+            // else
+            if (blockNumber[i].contains("else")) {
+                // 回填真链2
+                four_address_code_all[True2[0]].res = QString::number(four_address_code_all.size() + 1);
+                for (int j = i;j < blockNumber.size(); j++) {
+                    if (blockNumber[j].contains('}')) {
+                        temp_end = j - 1;
+                        break;
+                    }
+                }
+
+                Gen(i + 1, temp_end);
+                code.op = 'J';
+                code.arg2 = " ";
+                code.arg1 = " ";
+                code.res = "";
+                four_address_code_all.push_back(code);
+                Flase.push_back(four_address_code_all.size() - 1);
+            }
+            i = temp_end + 1;
+
+            // 回填
+            for (int j = 0; j < Flase.size(); j++) {
+                four_address_code_all[Flase[j]].res = QString::number(four_address_code_all.size() + 1);
+            }
+        }
+        else if (blockNumber[i].contains("while")) {
+            // 清空真链假链
+            True1.clear();
+            True2.clear();
+            Flase.clear();
+            True2.push_back(four_address_code_all.size() + 1);
+            // 
+            int l = KMP2(blockNumber[i], "(")[0] + 1;
+            int r = KMP2(blockNumber[i], ")")[0] - 1;
+            QString back = Trans(blockNumber[i].mid(l, r - l + 1));
+
+            QStack<QString> tmp;
+            for (int j = 0; j < back.size(); j++) {
+                if (back[j] >= 'a' && back[j] <= 'z' || back[j] >= '0' && back[j] <= '9') {
+                    tmp.push(back[j]);
+                }
+                else if (back[j] == '<' || back[j] == '>') {
+                    four_address_code code;
+                    code.op = 'J' + back[j];
+                    code.arg2 = tmp.top();
+                    tmp.pop();
+                    code.arg1 = tmp.top();
+                    tmp.pop();
+                    code.res = "";
+                    code.type = "while";
+                    four_address_code_all.push_back(code);
+                    True1.push_back(four_address_code_all.size() - 1); // 真链
+                }
+                else {
+                    four_address_code code;
+                    code.op = back[j];
+                    code.arg2 = tmp.top();
+                    tmp.pop();
+                    code.arg1 = tmp.top();
+                    tmp.pop();
+                    QString temp_name = "T" + QString::number(temp_num_count);
+                    code.res = temp_name;
+                    temp_num_count++;
+                    tmp.push(temp_name);
+                    code.type = "while";
+                    four_address_code_all.push_back(code);
+                }
+            }
+            four_address_code code;
+            code.op = 'J';
+            code.arg2 = " ";
+            code.arg1 = " ";
+            code.res = "";
+            four_address_code_all.push_back(code);
+            Flase.push_back(four_address_code_all.size() - 1); // 假链
+            // 回填真链
+            four_address_code_all[True1[0]].res = QString::number(four_address_code_all.size() + 1);
+            // while
+            int temp_end = 0;
+            for (int j = i;j < blockNumber.size(); j++) {
+                if (blockNumber[j].contains('}')) {
+                    temp_end = j - 1;
+                    break;
+                }
+            }
+            Gen(i + 1, temp_end);
+
+            code.op = 'J';
+            code.arg2 = " ";
+            code.arg1 = " ";
+            code.res = "";
+            four_address_code_all.push_back(code);
+            four_address_code_all[four_address_code_all.size() - 1].res = QString::number(True2[0]);
+            i = temp_end + 1;
+            // 回填
+            for (int j = 0; j < Flase.size(); j++) {
+                four_address_code_all[Flase[j]].res = QString::number(four_address_code_all.size() + 1);
+            }
+
+        }
+        else if (blockNumber[i].contains("for")) {
+            int temp_end = 0;
+            for (int j = i;j < blockNumber.size(); j++) {
+                if (blockNumber[j].contains('}')) {
+                    temp_end = j - 1;
+                    break;
+                }
+            }
+            Gen(i + 1, temp_end);
+
+            four_address_code code;
+            code.op = 'J';
+            code.arg2 = " ";
+            code.arg1 = " ";
+            code.res = "";
+            four_address_code_all.push_back(code);
+        }
+        else if (blockNumber[i].contains("=")) {
+            qDebug() << blockNumber[i];
+            QString back = Trans(blockNumber[i].mid(0, blockNumber[i].size() - 1));
+            qDebug() << back;
+            QStack<QString> tmp;
+            for (int j = 0; j < back.size(); j++) {
+                if (back[j] >= 'a' && back[j] <= 'z' || back[j] >= '0' && back[j] <= '9') {
+                    tmp.push(back[j]);
+                }
+                else {
+                    four_address_code code;
+                    code.op = back[j];
+                    if (back[j] != '=') {
+                        code.arg2 = tmp.top();
+                        tmp.pop();
+                    }
+                    code.arg1 = tmp.top();
+                    tmp.pop();
+                    if (back[j] != '=') {
+                        QString temp_name = "T" + QString::number(temp_num_count);
+                        code.res = temp_name;
+                        temp_num_count++;
+                        tmp.push(temp_name);
+                    }
+                    else {
+                        code.res = tmp.top();
+                        tmp.pop();
+                    }
+                    code.type = "assign";
+                    four_address_code_all.push_back(code);
+                }
+            }
+        }
+    }
+}
+void Compiler::semanticAnalysis() {
+    // 初始化
+    temp_num_count = 0;
+    blockNumber.clear();
+    temp_num.clear();
+    four_address_code_all.clear();
+    //
+    Block();
+    // 生成四元式
+    Gen(0, blockNumber.size() - 1);
+    four_address_code code;
+    code.op = "return";
+    code.arg2 = " ";
+    code.arg1 = " ";
+    code.res = " ";
+    four_address_code_all.push_back(code);
+    // 输出四元式
+    csOutPut6->setPlainText("四元式：\n");
+    for (int i = 0; i < four_address_code_all.size();i++) {
+        csOutPut6->moveCursor(QTextCursor::End);
+        csOutPut6->insertPlainText(QString::number(i + 1) + " (" + four_address_code_all[i].op + "," + four_address_code_all[i].arg1 + "," + four_address_code_all[i].arg2 + "," + four_address_code_all[i].res + ")\n");
+    }
 }
 //---------------------------语义分析----------------------//
 
 //---------------------------生成代码----------------------//
-void Compiler::generateCode() {
+// 划分块
+QVector<QVector<int>> fenKuai() {
+    QVector<QVector<int>> temp;
+    QVector<int> temp_block;
+    QVector<bool> visited(four_address_code_all.size(), false); // 用于标记已访问的指令
 
+    for (int i = 0; i < four_address_code_all.size(); i++) {
+        if (!visited[i]) { // 如果该指令还未被访问，则开始一个新的块
+            temp_block.clear();
+            // 从当前指令开始，添加到当前块中
+            int current = i;
+            while (current < four_address_code_all.size() && !visited[current]) {
+                temp_block.push_back(current);
+                visited[current] = true; // 标记为已访问
+
+                // 检查是否有跳转指令，如果有则根据跳转找到下一个指令
+                if (four_address_code_all[current].op == "J" || four_address_code_all[current].op == "J<" || four_address_code_all[current].op == "J>") {
+                    temp.push_back(temp_block); // 添加当前块到结果中
+                    temp_block.clear(); // 清空当前块
+                    // 这里假设跳转的目标是指令的索引，可以根据你的数据结构调整
+                    current = QString(four_address_code_all[current].res).toInt() - 1; // 设置为跳转的目标
+                }
+                else {
+                    current++; // 否则继续处理下一条指令
+                }
+            }
+            if(temp_block.size() > 0) temp.push_back(temp_block); // 添加当前块到结果中
+        }
+    }
+
+    return temp;
+}
+
+// 寄存器数量
+int register_num;
+QHash<QString, QString> tempToRegMap; // 临时变量与寄存器的映射
+QString getRegister() {
+    return "$t" + QString::number(register_num++);
+}
+// 辅助函数：获取操作数的寄存器
+QString getOperandReg(QString operand) {
+    if (operand[0] == 'T') {
+        if (!tempToRegMap.contains(operand)) {
+            QString reg = getRegister();
+            tempToRegMap[operand] = reg;
+            return reg; // 新分配的寄存器
+        }
+        else {
+            return tempToRegMap[operand]; // 已存在的寄存器
+        }
+    }
+    else {
+        // 直接返回操作数（如常数或变量）
+        return operand;
+    }
+}
+QVector<QString> GenerateCode(four_address_code qua, QVector<QVector<int>> temp_fenKuai) {
+    QVector<QString> code; // 存放生成的代码
+    if (qua.op == "+") {
+        QString reg1 = getOperandReg(qua.arg1);
+        QString reg2 = getOperandReg(qua.arg2);
+        QString resultReg = getRegister();
+        code.push_back("\tmov " + resultReg + ", " + reg1);
+        code.push_back("\tadd " + resultReg + ", " + reg2);
+        code.push_back("\tmov " + resultReg + ", " + getOperandReg(qua.res));
+    }
+    else if (qua.op == "-") {
+        QString reg1 = getOperandReg(qua.arg1);
+        QString reg2 = getOperandReg(qua.arg2);
+        QString resultReg = getRegister();
+        code.push_back("\tmov " + resultReg + ", " + reg1);
+        code.push_back("\tsub " + resultReg + ", " + reg2);
+        code.push_back("\tmov " + resultReg + ", " + getOperandReg(qua.res));
+    }
+    else if (qua.op == "*") {
+        QString reg1 = getOperandReg(qua.arg1);
+        QString reg2 = getOperandReg(qua.arg2);
+        QString resultReg = getRegister();
+        code.push_back("\tmov " + resultReg + ", " + reg1);
+        code.push_back("\tmul " + resultReg + ", " + reg2);
+        code.push_back("\tmov " + resultReg + ", " + getOperandReg(qua.res));
+    }
+    else if (qua.op == "/") {
+        QString reg1 = getOperandReg(qua.arg1);
+        QString reg2 = getOperandReg(qua.arg2);
+        code.push_back("\tmov $t" + QString::number(register_num++) + ", " + reg1);
+        code.push_back("\tmov $t" + QString::number(register_num++) + ", " + reg2);
+        code.push_back("\tdiv $t" + QString::number(register_num - 1)); // 用于除法
+        code.push_back("\tmov " + getOperandReg(qua.res) + ", $t" + QString::number(register_num - 2)); // 存储结果
+    }
+    else if (qua.op == "=") {
+        QString reg1 = getOperandReg(qua.arg1);
+        code.push_back("\tmov " + getOperandReg(qua.res) + ", " + reg1);
+    }
+    else if (qua.op == "return") {
+        code.push_back("\tEND");
+    }
+    
+    else if (qua.op == "J<") {
+        //if (qua.type == "if") {
+        //    code.push_back("L" + QString::number(qua.Block) + ":\n");
+        //}
+        //if (qua.type == "while") {
+        //    code.push_back("L" + QString::number(qua.Block) + ":\n");
+        //}
+        code.push_back("\tCMP " + qua.arg1 + ", " + qua.arg2);
+        code.push_back("\tJA L" + QString::number(four_address_code_all[QString(qua.res).toInt() - 1].Block));
+    }
+    else if (qua.op == "J>") {
+        /*if (qua.type == "if") {
+            code.push_back("L" + QString::number(qua.Block) + ":\n");
+        }
+        if (qua.type == "while") {
+            code.push_back("L" + QString::number(qua.Block) + ":\n");
+        }*/
+        code.push_back("\tCMP " + qua.arg1 + ", " + qua.arg2);
+        code.push_back("\tJB L" + QString::number(four_address_code_all[QString(qua.res).toInt() - 1].Block));
+    }
+    else if (qua.op == 'J') {
+        code.push_back("\tJMP L" + QString::number(four_address_code_all[QString(qua.res).toInt()- 1].Block));
+    }
+    return code;
+}
+void Compiler::generateCode() {
+    QVector<QVector<int>> temp_fenKuai = fenKuai();
+    std::sort(temp_fenKuai.begin(), temp_fenKuai.end());
+    
+    for (int i = 1; i <= temp_fenKuai.size(); i++) {
+        for (auto it : temp_fenKuai[i - 1]) {
+            four_address_code_all[it].Block = i;
+        }
+    }
+    for (auto it : temp_fenKuai) {
+            qDebug() << it;
+    }
+    qDebug() << four_address_code_all[5].op;
+    // 创建一个QFile对象
+    QFile file("C:/Users/dsq2/Desktop/Output.txt");
+
+    // 打开文件，以写入模式打开
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // 创建一个QTextStream对象
+        QTextStream out(&file);
+        out << "main:\n";
+        for (int i = 0;i < temp_fenKuai.size();i++) {
+            register_num = 0;
+            out << "L" << i + 1 << ":\n";
+            for (int j = 0;j < temp_fenKuai[i].size();j++) {
+                // 写入内容到文件
+                for (auto it : GenerateCode(four_address_code_all[temp_fenKuai[i][j]], temp_fenKuai)) {
+                    out << it << "\n";
+                }
+            }
+
+        } 
+        // 关闭文件
+        file.close();
+    }
+    else {
+        // 如果无法打开文件，打印错误信息
+        qDebug() << "无法打开文件:" << file.errorString();
+    }
 }
 //---------------------------生成代码----------------------//
 
@@ -805,8 +1398,8 @@ void Compiler::on_chargeCs5_2_clicked() {
     Compiler compiler(ui);
     compiler.lexicalAnalysis(); // 调用 lexicalAnalysis 方法
     compiler.syntaxAnalysis(); // 调用 syntaxAnalysis 方法
-    //compiler.semanticAnalysis(); // 调用 semanticAnalysis 方法
-    //compiler.generateCode(); // 调用 generateCode 方法
+    compiler.semanticAnalysis(); // 调用 semanticAnalysis 方法
+    compiler.generateCode(); // 调用 generateCode 方法
 
 }
 
