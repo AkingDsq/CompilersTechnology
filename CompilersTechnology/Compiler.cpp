@@ -352,117 +352,10 @@ struct LL1Output2 {
     QStack<QString> input_stack;
     QString use;
 };
-// 
-struct Symbol
-{
-    QString varName;       //变量名
-    QString valueStr{ "0" }; //变量的值，字符串形式,初始化为0
-    int PLACE{ -1 };        //该变量在符号表中的位置,初始化为-1
-};
-struct FourYuanFormula
-{                  //四元式结构体
-    QString op;     //操作符
-    int arg1Index; //源操作数1的符号表地址
-    int arg2Index; //源操作数2的符号表地址
-    Symbol result; //目的操作数
-};
-QVector<FourYuanFormula> formula; //四元式序列
-QVector<Symbol> symbolTable;      //符号表
-QMap<QString, int> ENTRY;          //用于查变量的符号表入口地址
-int tempVarNum = 0;              //临时变量个数
-Symbol newtemp()
-{ //生成新的临时变量
-    tempVarNum++;
-    return Symbol{ "T" + QString::number(tempVarNum) };
-}
-
-void GEN(QString op, int arg1, int arg2, Symbol& result)
-{ //运算符、参数1在符号表的编号、参数2在符号表的编号，结果符号
-    //产生一个四元式，并填入四元式序列表
-    QString op_str = "";
-    op_str = "(" + op + ",";
-    arg1 != -1 ? op_str.append( symbolTable[arg1].varName) : op_str.append("_");
-    op_str.append(",");
-    arg2 != -1 ? op_str.append(symbolTable[arg2].varName) : op_str.append("_");
-    op_str.append("," + result.varName + ")" );
-    formula.push_back(FourYuanFormula{ op, arg1, arg2, result }); //插入到四元式序列中
-    if (op == "@")
-    { //将临时变量result注册进入符号表
-        result.varName;
-        result.PLACE = symbolTable.size();
-        result.valueStr = "-" + symbolTable[arg1].valueStr;
-        symbolTable.push_back(result);
-        ENTRY[result.varName] = result.PLACE;
-    }
-    if (op == "+")
-    { //将临时变量result注册进入符号表
-        result.PLACE = symbolTable.size();
-        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() + symbolTable[arg2].valueStr.toInt());
-        symbolTable.push_back(result);
-        ENTRY[result.varName] = result.PLACE;
-    }
-    if (op == "-")
-    { //将临时变量result注册进入符号表
-        result.PLACE = symbolTable.size();
-        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() - symbolTable[arg2].valueStr.toInt());
-        symbolTable.push_back(result);
-        ENTRY[result.varName] = result.PLACE;
-    }
-    if (op == "*")
-    { //将临时变量result注册进入符号表
-        result.PLACE = symbolTable.size();
-        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() * symbolTable[arg2].valueStr.toInt());
-        symbolTable.push_back(result);
-        ENTRY[result.varName] = result.PLACE;
-    }
-    if (op == "/")
-    { //将临时变量result注册进入符号表
-        result.PLACE = symbolTable.size();
-        result.valueStr = QString::number(symbolTable[arg1].valueStr.toInt() / symbolTable[arg2].valueStr.toInt());
-        symbolTable.push_back(result);
-        ENTRY[result.varName] = result.PLACE;
-    }
-    if (op == "=") //这个result不是临时变量了，故不用注册进入符号表，只进行绑定
-        result.valueStr = symbolTable[arg1].valueStr;
-}
 
 // 文法输入表
 QVector<LL1Input2> Input_all2
 {
-    //LL1Input2{"Pro", "State_str"},                  // Program ::= <声明串>
-    //LL1Input2{"State_str", "State A"},              // <声明串> ::=<声明>{<声明>}
-    //LL1Input2{"A", "State_str|$"},
-    //LL1Input2{"State", "int ID State_type|void ID Fun_state"}, //<声明> ::=int <声明类型> | void <函数声明>
-    //LL1Input2{"State_type", "Var_state|Fun_state"},   // <声明类型>::=<变量声明> | <函数声明>
-    //LL1Input2{"Var_state", ";"},                   // <变量声明> ::= ;
-    //LL1Input2{"Fun_state", "(Form_par) Block"},     // <函数声明> ::=’ (‘<形参>’) ‘<语句块>
-    //LL1Input2{"Form_par", "Par_list|$"}, // <形参>::= <参数列表> | $
-    //LL1Input2{"Par_list", "Par B"},     // <参数列表> ::= <参数> {, <参数>}
-    //LL1Input2{"B", ",Par B|$"},
-    //LL1Input2{"Par", "int ID|char ID|float ID"},  // <参数> ::= int
-    //LL1Input2{"Block", "{Iner_state Sent_str}"}, // <语句块> ::= ‘{‘<内部声明> <语句串>’}’
-    //LL1Input2{"Iner_state", "Iner_par_sate Iner_state|$"},  // <内部声明> ::= 空 | <内部变量声明>{<内部变量声明>}
-    //LL1Input2{"Iner_par_state", "int ID"},    // <内部变量声明>::=int ;
-    //LL1Input2{"Sent_str", "Sent C"},    // <语句串> ::= <语句>{ <语句> }
-    //LL1Input2{"C", "Sent_str|$"},
-    //LL1Input2{"Sent", "Sent_if|Sent_while|Sent_return|Sent_eval"},  // <语句> ::= <if语句> |< while语句> | <return语句> | <赋值语句>
-    //LL1Input2{"Sent_eval", "ID = Exp;"},  // <赋值语句> ::= =<表达式>;
-    //LL1Input2{"D", "Exp;|;"},  // <return语句> ::= return [ <表达式> ] 
-    //LL1Input2{"Sent_while", "while (Exp) Block"}, // <while语句> ::= while ‘( ‘<表达式> ‘)’ <语句块>
-    //LL1Input2{"Sent_if", "if(Exp) Block E"}, // <if语句> ::= if ‘(‘<表达式>’)’ <语句块> else <语句块>
-    //LL1Input2{"E", "else Block|$"}, 
-    //LL1Input2{"Exp", "Exp_add F"},// <表达式>::=<加法表达式>{ relop <加法表达式> } 
-    //LL1Input2{"F", "relop Exp_add F|$"},
-    //LL1Input2{"Exp_add", "Nape G"}, // <加法表达式> ::= <项> {+ <项> | -<项>}
-    //LL1Input2{"G", "+ Nape G|- Nape G|$"},
-    //LL1Input2{"Nape", "Div H"}, // <项> ::= <因子> {* <因子> | /<因子>}
-    //LL1Input2{"H", "* DivH|/ DivH|$"},
-    //LL1Input2{"Div", "num|(Exp)|ID Ftype"}, // <因子> ::=num | ‘(‘<表达式>’)’ | FTYPE
-    //LL1Input2{"Ftype", "Call|$"}, 
-    //LL1Input2{"Call", "(Act)"}, // <call> ::=’(’<实参> ’) ’
-    //LL1Input2{"Act", "Act_list|$"}, // <实参> ::=<实参列表> | 空
-    //LL1Input2{"Act_list", "Exp H"}, // <实参列表> ::= <表达式>{, <表达式>}
-    //LL1Input2{"H", ",Exp H|$"}, // <实参列表> ::= <表达式>{, <表达式>}
     // 文法输入表
     // 终结符:{
     /* 'm' : keyword:main 12, 't' : 类型TYPE 2, 'i' : 标识符IDENTIFIER 4， 'n' : 常量CONSTINTEGRAL 5, '(' : 左小括号left_Parentheses 6,
@@ -1323,7 +1216,7 @@ QVector<QString> GenerateCode(four_address_code qua, QVector<QVector<int>> temp_
         code.push_back("\tmov " + getOperandReg(qua.res) + ", " + reg1);
     }
     else if (qua.op == "return") {
-        code.push_back("\tEND");
+        code.push_back("END");
     }
     
     else if (qua.op == "J<") {
@@ -1402,4 +1295,3 @@ void Compiler::on_chargeCs5_2_clicked() {
     compiler.generateCode(); // 调用 generateCode 方法
 
 }
-

@@ -73,7 +73,6 @@ void NFA::on_deleteCs2_clicked() {
         QWidget* widget = CsInput_2Layout->itemAtPosition((SumNum) - 1, i)->widget(); // 获取控件
         if (SumNum != 1) CsInput_2Layout->removeWidget(widget); // 第一行第一列
     }
-
 }
 // 把输入的状态转换添加到节点数组
 void add_node(QString state, QChar c, QString next) {          
@@ -101,8 +100,7 @@ QString getClosure(QVector<NFAnode> nodes, QString state, QChar c) {
             }
         }
     }
-
-    for (const QChar& ch : Closure) {        // 去重并且输入到ans中，但是没有按照顺序排列
+    for (auto ch : Closure) {        // 去重并且输入到ans中，但是没有按照顺序排列
         ans.append(ch);
     }
     return ans;
@@ -263,7 +261,7 @@ void NFA::on_chargeCs2_clicked() {
             QSet<QChar> temp = NFA[i + j].nexts[Vt[j]];
 
             QString tempStr = "";
-            for (const QChar& ch : temp) {
+            for (auto ch : temp) {
                 tempStr.append(ch);
             }
             csOutput2->moveCursor(QTextCursor::End);
@@ -316,7 +314,7 @@ void NFA::on_chargeCs2_clicked() {
             QSet<QChar> temp = NFA[i + j].nexts[Vt[j]];
 
             QString tempStr = "";
-            for (const QChar& ch : temp) {
+            for (auto ch : temp) {
                 tempStr.append(ch);
             }
             csOutput3->moveCursor(QTextCursor::End);
